@@ -17,7 +17,7 @@ public class NetworkHandler<T extends NetworkConnection> {
     private int          MAX_NUMBER_CONNECTIONS     = 5;     // Maximum number of processes that are running leave low to reduce tor overhead
     private int          CURRENT_NUMBER_CONNECTIONS = 0;     // Current Number of tor connections active
     private boolean      CONNECTED                  = false; // Whether any connections have started...
-    private ArrayList<T> connectionPool             = new ArrayList<>(); // List of Tor connections available
+    private ArrayList<T> connectionPool             = new ArrayList<>(); // List of Tor connections available TODO: Convert this field to hashMap for performance
 
     public NetworkHandler(int connectionLimit) {
         this.setConnectionLimit(connectionLimit);
