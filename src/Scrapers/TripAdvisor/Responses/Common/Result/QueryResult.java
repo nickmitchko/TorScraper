@@ -6,7 +6,8 @@ package Scrapers.TripAdvisor.Responses.Common.Result;
  * Package  : Scrapers.TripAdvisor.Responses.Common
  * Project Name : DistributedScraper
  */
-public class Result {
+public class QueryResult {
+    private int           indexInType;
     private String        lookbackServlet;
     private String        autobroadened;
     private String        title;
@@ -17,9 +18,8 @@ public class Result {
     private String        scope;
     private String        name;
     private String        data_type;
-    private Detail        details;
     private String        airportCode;
-    private long          value;
+    private String        value;
     private String        coords;
 
     public String getTitle() {
@@ -34,10 +34,6 @@ public class Result {
         return name;
     }
 
-    public Detail getDetails() {
-        return details;
-    }
-
     public String getAirportCode() {
         return airportCode;
     }
@@ -47,11 +43,11 @@ public class Result {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return this.getName() + " @ " + this.getUrl();
     }
 
-    public long getValue() {
+    public Object getValue() {
         return value;
     }
 }

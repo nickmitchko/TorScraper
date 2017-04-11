@@ -13,7 +13,7 @@ import java.net.Proxy;
  */
 public class DirectConnection implements NetworkConnection {
     @Override
-    public Proxy getConnection() {
+    public Proxy getProxy() {
         return Proxy.NO_PROXY;
     }
 

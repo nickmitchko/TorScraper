@@ -1,13 +1,19 @@
 package Scrapers.TripAdvisor;
 
-import Scrapers.TripAdvisor.Responses.LocationSearch;
+import Common.Structures.Tuple;
+import Network.NetworkHandler;
+import Scrapers.TripAdvisor.Responses.TypeAheadQuery;
+import Scrapers.TripAdvisor.Responses.TypeAheadSearch;
 import com.google.gson.Gson;
 
 import java.io.IOException;
-import java.io.Reader;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.UnsupportedEncodingException;
-import java.net.*;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -27,43 +33,92 @@ public class Utilities {
     private static final String baseURL      = "https://www.tripadvisor.com/";
     private static final int    resultAmount = 10;
 
-    public static void locationSearch(String Query) throws IOException {
-        Utilities.locationSearch(Query, Proxy.NO_PROXY);
+    public static TypeAheadSearch locationSearch(String Query, NetworkHandler networkHandler) throws IOException {
+        @SuppressWarnings("unchecked")
+        Tuple<String, String>[] parameters = new Tuple[]{
+                new Tuple<>("interleaved", "true"),
+                new Tuple<>("types", "geo"),
+                new Tuple<>("neighborhood_geos", "true"),
+                new Tuple<>("link_type", "geo"),
+                new Tuple<>("details", "true"),
+                new Tuple<>("max", "" + Utilities.resultAmount),
+                new Tuple<>("hgtl", "true"),
+                new Tuple<>("query", Query),
+                new Tuple<>("action", "API"),
+                new Tuple<>("startTime", "" + System.currentTimeMillis()),
+                new Tuple<>("uiOrigin", "GEOSCOPE"),
+                new Tuple<>("source", "GEOSCOPE")};
+        @SuppressWarnings("unchecked")
+        Tuple<String, String>[] headers = new Tuple[]{
+                new Tuple<>("Host", "www.tripadvisor.com"),
+                new Tuple<>("User-Agent", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0"),
+                new Tuple<>("Accept", "text/javascript, text/html, application/xml, text/xml, */*"),
+                new Tuple<>("Accept-Language", "en-US,en;q=0.5"),
+                new Tuple<>("Accept-Encoding", "gzip"),
+                new Tuple<>("X-Requested-With", "XMLHttpRequest"),
+                new Tuple<>("Referer", "https://www.tripadvisor.com/"),
+                new Tuple<>("Connection", "keep-alive")
+        };
+        HttpURLConnection searchConnection   = (HttpURLConnection) networkHandler.getRequest(parameters, headers, Utilities.baseURL + "TypeAheadJson");
+        Reader            responseReader     = new InputStreamReader("gzip".equals(searchConnection.getContentEncoding()) ? new GZIPInputStream(searchConnection.getInputStream()) : searchConnection.getInputStream());
+        StringBuilder     searchJsonResponse = new StringBuilder();
+        int               currentByte;
+        while ((currentByte = responseReader.read()) != -1) {
+            searchJsonResponse.append((char) currentByte);
+        }
+        return new Gson().fromJson(searchJsonResponse.toString(), TypeAheadSearch.class);
     }
 
-    public static LocationSearch locationSearch(String Query, Proxy proxy) throws IOException {
-        HashMap<String, String> parameters = new HashMap<>();
-        parameters.put("interleaved", "true");
-        parameters.put("types", "geo");
-        parameters.put("neighborhood_geos", "true");
-        parameters.put("link_type", "geo");
-        parameters.put("details", "true");
-        parameters.put("max", "" + Utilities.resultAmount);
-        parameters.put("hgtl", "true");
-        parameters.put("query", Query);
-        parameters.put("action", "API");
-        parameters.put("startTime", "" + System.currentTimeMillis());
-        parameters.put("uiOrigin", "GEOSCOPE");
-        parameters.put("source", "GEOSCOPE");
-        HttpURLConnection searchConnection = (HttpURLConnection) makeParametrizedURL(Utilities.baseURL + "TypeAheadJson", parameters).openConnection(proxy);
-        searchConnection.setRequestMethod("GET");
-        searchConnection.setInstanceFollowRedirects(true);
-        searchConnection.setRequestProperty("Host", "www.tripadvisor.com");
-        searchConnection.setRequestProperty("User-Agent", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0");
-        searchConnection.setRequestProperty("Accept", "text/javascript, text/html, application/xml, text/xml, */*");
-        searchConnection.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-        searchConnection.setRequestProperty("Accept-Encoding", "gzip");
-        searchConnection.setRequestProperty("X-Requested-With", "XMLHttpRequest");
-        searchConnection.setRequestProperty("Referer", "https://www.tripadvisor.com/");
-        searchConnection.setRequestProperty("Connection", "keep-alive");
-        Reader responseReader = new InputStreamReader("gzip".equals(searchConnection.getContentEncoding()) ? new GZIPInputStream(searchConnection.getInputStream()) : searchConnection.getInputStream());
-        StringBuilder searchJsonResponse = new StringBuilder();
-        int currentByte;
+    public static TypeAheadQuery querySearch(String query, String geo, NetworkHandler networkHandler) throws IOException {
+        @SuppressWarnings("unchecked")
+        Tuple<String, String>[] parameters = new Tuple[]{
+                new Tuple<>("interleaved", "true"),
+                new Tuple<>("geoPages","true"),
+                new Tuple<>("matchTags","true"),
+                new Tuple<>("matchGlobalTags","true"),
+                new Tuple<>("matchKeywords","true"),
+                new Tuple<>("strictAnd","false"),
+                new Tuple<>("scoreThreshold","0.8"),
+                new Tuple<>("disableMaxGroupSize","true"),
+                new Tuple<>("scopeFilter","global"),
+                new Tuple<>("injectNewLocation","true"),
+                new Tuple<>("injectLists","true"),
+                new Tuple<>("nearby","false"),
+                new Tuple<>("local","true"),
+                new Tuple<>("parentids",geo),
+                new Tuple<>("types", "geo,hotel,eat,attr,vr,air,theme_park,al,act"),
+                new Tuple<>("neighborhood_geos", "true"),
+                new Tuple<>("link_type", "geo"),
+                new Tuple<>("details", "true"),
+                new Tuple<>("max", "" + Utilities.resultAmount),
+                new Tuple<>("hgtl", "true"),
+                new Tuple<>("query", query),
+                new Tuple<>("action", "API"),
+                new Tuple<>("startTime", "" + System.currentTimeMillis()),
+                new Tuple<>("uiOrigin", "MASTHEAD"),
+                new Tuple<>("source", "MASTHEAD")
+        };
+        @SuppressWarnings("unchecked")
+        Tuple<String, String>[] headers = new Tuple[]{
+                new Tuple<>("Host", "www.tripadvisor.com"),
+                new Tuple<>("User-Agent", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0"),
+                new Tuple<>("Accept", "*/*"),
+                new Tuple<>("Accept-Language", "en-US,en;q=0.5"),
+                new Tuple<>("Accept-Encoding", "gzip"),
+                new Tuple<>("X-Requested-With", "XMLHttpRequest"),
+                new Tuple<>("Referer", "https://www.tripadvisor.com/"),
+                new Tuple<>("Connection", "keep-alive")
+        };
+        HttpURLConnection searchConnection = (HttpURLConnection) networkHandler.getRequest(parameters, headers, Utilities.baseURL + "TypeAheadJson");
+        Reader            responseReader     = new InputStreamReader("gzip".equals(searchConnection.getContentEncoding()) ? new GZIPInputStream(searchConnection.getInputStream()) : searchConnection.getInputStream());
+        StringBuilder     searchJsonResponse = new StringBuilder();
+        int               currentByte;
         while ((currentByte = responseReader.read()) != -1) {
-            searchJsonResponse.append((char)currentByte);
+            searchJsonResponse.append((char) currentByte);
         }
-        return new Gson().fromJson(searchJsonResponse.toString(), LocationSearch.class);
+        return new Gson().fromJson(searchJsonResponse.toString(), TypeAheadQuery.class);
     }
+
 
     public static URL makeParametrizedURL(String url, HashMap<String, String> parameters) throws MalformedURLException, UnsupportedEncodingException {
         if (!url.endsWith("?")) {

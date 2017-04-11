@@ -16,7 +16,7 @@ public interface NetworkConnection {
         DIRECT
     }
 
-    Proxy getConnection();
+    Proxy getProxy();
     void startConnection() throws IOException, InterruptedException;
     void endConnection() throws IOException;
     void setSocksPort(int port);

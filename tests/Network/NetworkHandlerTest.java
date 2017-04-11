@@ -25,27 +25,25 @@ class NetworkHandlerTest {
 
     @BeforeEach
     void setUp() {
-        TorHandler = new NetworkHandler<>(5);
-        directHandler = new NetworkHandler<>(5);
+        TorHandler = new NetworkHandler<>(5, TorConnection.class);
+        directHandler = new NetworkHandler<>(5, DirectConnection.class);
     }
 
     @Test
     void createNextConnection() {
         try {
             // TOR tests
-            Class             tor      = TorConnection.class;
-            NetworkConnection proxy    = TorHandler.createNextConnection(tor);
+            NetworkConnection proxy    = TorHandler.createNextConnection();
             URL               torCheck = new URL("https://check.torproject.org");
-            HttpURLConnection conn     = (HttpURLConnection) torCheck.openConnection(proxy.getConnection());
+            HttpURLConnection conn     = (HttpURLConnection) torCheck.openConnection(proxy.getProxy());
             Scanner           sc       = new Scanner(conn.getInputStream()).useDelimiter("\\A");
             String            result   = sc.hasNext() ? sc.next() : "";
             if (result.indexOf("Congratulations. This browser is configured to use Tor.") < 1) {
                 fail();
             }
             // Direct Connection tests
-            Class             net          = DirectConnection.class;
-            NetworkConnection direct       = directHandler.createNextConnection(net);
-            HttpURLConnection dirConn      = (HttpURLConnection) torCheck.openConnection(direct.getConnection());
+            NetworkConnection direct       = directHandler.createNextConnection();
+            HttpURLConnection dirConn      = (HttpURLConnection) torCheck.openConnection(direct.getProxy());
             Scanner           scanner      = new Scanner(dirConn.getInputStream()).useDelimiter("\\A");
             String            directResult = scanner.hasNext() ? scanner.next() : "";
             if (directResult.indexOf("Sorry. You are not using Tor.") < 1) {
@@ -65,8 +63,7 @@ class NetworkHandlerTest {
     @Test
     void endConnection() {
         try {
-            Class tor = TorConnection.class;
-            TorHandler.createNextConnection(tor);
+            TorHandler.createNextConnection();
             TorHandler.endConnection(0);
         } catch (IllegalAccessException e) {
             e.printStackTrace();

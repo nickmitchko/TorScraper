@@ -1,10 +1,10 @@
 package Scrapers.TripAdvisor;
 
-import Network.NetworkConnection;
 import Scrapers.ScraperDefault;
 
 import java.io.File;
-import java.net.Proxy;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created  : nicholai on 3/27/17.
@@ -14,16 +14,29 @@ import java.net.Proxy;
  */
 public class TripAdvisorScraper extends Thread implements ScraperDefault {
 
-    private final NetworkConnection scraperConnection;
+    private Logger logger = Logger.getLogger("myLogger");
 
-    public TripAdvisorScraper(NetworkConnection proxy){
+    private       File          directory;
+    private       File          output;
+    private       OUTPUT_FORMAT outputFormat;
+    private final String        url;
+    private boolean running = false;
+
+
+    public TripAdvisorScraper(String url) {
         super();
-        this.scraperConnection = proxy;
+        this.url = url;
     }
 
     @Override
     public void run() {
+        if (!this.running) {
+            this.running = true;
+            while (this.running) {
 
+
+            }
+        }
     }
 
     @Override
@@ -47,34 +60,48 @@ public class TripAdvisorScraper extends Thread implements ScraperDefault {
     }
 
     @Override
-    public void setOutputFormat() {
-
+    public void setOutputFormat(OUTPUT_FORMAT format) {
+        this.outputFormat = format;
     }
 
     @Override
-    public void setOutputDirectory() {
+    public void setOutputDirectory(File outputDirectory) {
+        if (outputDirectory.isDirectory()) {
+            this.directory = outputDirectory;
+        } else {
+            logger.log(Level.INFO, "The file supplied as 'outputDirectory' is not a valid directory. Please supply a valid directory");
+        }
+    }
 
+    @Override
+    public void setOutputFile(File outputFile) {
+        if (outputFile.isFile()) {
+            this.output = outputFile;
+            if (this.directory == null) {
+                this.directory = this.output.getParentFile();
+            }
+        } else {
+            logger.log(Level.INFO, "The file supplied as 'outputFile' is not a valid file.");
+        }
     }
 
     @Override
     public File getOutputDirectory() {
-        return null;
+        return directory;
     }
 
     @Override
     public OUTPUT_FORMAT getOutputFormat() {
-        return null;
+        return this.outputFormat;
     }
 
     @Override
     public void endScraping(boolean immediately) {
-        if (immediately){
+        if (immediately) {
             this.interrupt();
         } else {
-            // end loop
-            // save file
-            // stop loop
-            //
+            this.running = false;
+
             this.interrupt();
         }
     }

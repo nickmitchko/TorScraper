@@ -10,7 +10,7 @@ import Scrapers.TripAdvisor.Responses.Common.Result.Result;
  * Package  : Scrapers.TripAdvisor.Responses
  * Project Name : DistributedScraper
  */
-public class LocationSearch {
+public class TypeAheadSearch {
     private boolean       partial_content;
     private Result[]      results;
     private Normalization normalized;

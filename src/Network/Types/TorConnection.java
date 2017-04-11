@@ -58,7 +58,7 @@ public class TorConnection implements NetworkConnection {
     }
 
     @Override
-    public Proxy getConnection() {
+    public Proxy getProxy() {
         return this.proxy;
     }
 
@@ -101,7 +101,6 @@ public class TorConnection implements NetworkConnection {
 
     @Override
     public void setTorNumber(int number) {
-        this.TOR_PROCESS_NUMBER = number;
     }
 
     @Override
@@ -121,19 +120,19 @@ public class TorConnection implements NetworkConnection {
     private int startTorProcess() throws IOException, InterruptedException {
         if (!active) {
             this.createTorDataDir();
-            this.torProcess = Runtime.getRuntime().exec("tor --RunAsDaemon 1 --CookieAuthentication 0 --HashedControlPassword \"\" --ControlPort " + this.TOR_CTRL_PORT + " --PidFile tor" + this.TOR_PROCESS_NUMBER + ".pid --SocksPort " + this.TOR_CTRL_PORT + " --DataDirectory ./data/tor" + this.TOR_PROCESS_NUMBER);
+            this.torProcess = Runtime.getRuntime().exec("tor --RunAsDaemon 1 --CookieAuthentication 0 --HashedControlPassword \"\" --ControlPort " + this.TOR_CTRL_PORT + " --PidFile tor" + this.TOR_SOCKS_PORT + ".pid --SocksPort " + this.TOR_CTRL_PORT + " --DataDirectory ./data/tor" + this.TOR_SOCKS_PORT + " &");
         }
         return this.torProcess.isAlive() ? 0 : 1;
     }
 
     private void endTorProcess() throws IOException {
         if (active) {
-            Runtime.getRuntime().exec("pkill -F tor" + this.TOR_PROCESS_NUMBER + ".pid");
+            Runtime.getRuntime().exec("pkill -F tor" + this.TOR_SOCKS_PORT + ".pid");
         }
     }
 
     private void createTorDataDir() {
-        File dataDirectory = new File("./data/tor" + this.TOR_PROCESS_NUMBER + "/");
+        File dataDirectory = new File("./data/tor" + this.TOR_SOCKS_PORT + "/");
         if (!dataDirectory.exists()) {
             dataDirectory.mkdirs();
         }
