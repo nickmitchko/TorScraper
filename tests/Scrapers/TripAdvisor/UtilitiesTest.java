@@ -58,7 +58,7 @@ class UtilitiesTest {
         String[] searches = new String[]{"New York", "Los Angeles", "Boston"};
         for (String s : searches) {
             try {
-                TypeAheadSearch search  = Utilities.locationSearch(s, torHandler);
+                TypeAheadSearch search  = Utilities.locationSearch(s);
                 Result[]        results = search.getResults();
                 for (Result result : results) {
                     if (result.getUrl() == null) {
@@ -77,7 +77,7 @@ class UtilitiesTest {
     void querySearch(){
         long geoCode = 0; // GEO Code
         try {
-            TypeAheadSearch location = Utilities.locationSearch("New York City", torHandler);
+            TypeAheadSearch location = Utilities.locationSearch("New York City");
             Result[] results = location.getResults();
             geoCode = results[0].getValue();
         } catch (IOException e) {
@@ -87,7 +87,7 @@ class UtilitiesTest {
         String[] searches = new String[]{"Hotels", "Restaurants", "Tours"};
         for(String s : searches){
             try{
-                TypeAheadQuery search  = Utilities.querySearch(s, "" + geoCode, torHandler);
+                TypeAheadQuery search  = Utilities.querySearch(s, "" + geoCode);
                 QueryResult[]  results = search.getResults();
                 if (results[0].getValue() != null){
                     System.out.println(results[0].getUrl());

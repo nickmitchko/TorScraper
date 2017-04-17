@@ -12,6 +12,7 @@ import java.net.*;
  * Package  : Network
  * Project Name : DistributedScraper
  */
+
 public class TorConnection implements NetworkConnection {
 
     private int     TOR_SOCKS_PORT     = 0;

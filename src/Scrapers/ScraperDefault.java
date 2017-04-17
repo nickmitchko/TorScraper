@@ -21,6 +21,7 @@ public interface ScraperDefault {
     void setOutputFormat(OUTPUT_FORMAT format);
     void setOutputDirectory(File outputDirectory);
     void setOutputFile(File outputFile);
+    void openFile();
     File getOutputDirectory();
     OUTPUT_FORMAT getOutputFormat();
     void endScraping(boolean immediately);
